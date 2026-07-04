@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-dark: #0f172a;    /* Deep Slate */
+  --color-brand-primary: #4f46e5; /* Indigo */
+  --color-brand-accent: #10b981;  /* Emerald Accent */
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
