@@ -42,7 +42,7 @@ Core goals:
 Open the project root:
 
 ```bash
-cd "Mayzax CRM 1"
+cd "Mayzax CRM"
 ```
 
 ### 2. Configure Environment Variables

@@ -118,13 +118,7 @@ const DashboardLayout = () => {
               {currentSection}
             </h1>
           </div>
-          <div className="flex items-center space-x-4">
-            {/* Real-time Indicator Notification Bell Layout */}
-            <div className="relative p-2 text-slate-500 hover:text-slate-700 cursor-pointer">
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-accent rounded-full"></span>
-              🔔
-            </div>
-          </div>
+          
         </header>
         
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">

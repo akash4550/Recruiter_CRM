@@ -204,7 +204,7 @@ INSERT INTO users
 VALUES
 (
 'Akshay Lakwal',
-'lakwalakshay5@gmail.com',
+'admin@mayzax.com',
 crypt('Admin@123', gen_salt('bf')),
 'Super Admin',
 'Active'
