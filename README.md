@@ -149,9 +149,3 @@ Environment notes for Render:
 
 ---
 
-If you'd like, I can:
-
-- Run a quick script to extract and list all endpoints automatically.
-- Add a short `DEPLOYMENT.md` with Render step-by-step keys and expected environment variables.
-
-Updated to match the code currently in this repository.
