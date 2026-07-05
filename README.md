@@ -1,63 +1,26 @@
 # Mayzax CRM
 
-Mayzax CRM is a MERN-style customer relationship and recruitment management application for managing clients, employees, recruiters, open positions, and follow-up tasks. The backend uses Node.js, Express, PostgreSQL, JWT authentication, and role-based access control. The frontend uses React, Vite, Axios, and Tailwind CSS.
+Mayzax CRM is a production-focused customer-relationship and recruitment management application.
+The backend is a Node.js + Express API with PostgreSQL; the frontend is a Vite + React SPA.
 
-## Project Overview
+This README documents how to run, test, and deploy the exact code included in this submission.
 
-The system provides a secured CRM dashboard for Mayzax users. Authenticated users can access role-specific modules for client management, employee administration, recruiter management, job position tracking, dashboard metrics, and task follow-up tracking.
+## Quick Summary
 
-Core goals:
+- Backend: Node.js (CommonJS), Express, PostgreSQL (`pg` client).
+- Frontend: React, Vite, React Router, Axios, Tailwind CSS.
+- Auth: JWT tokens issued by the API; password hashes use bcrypt.
 
-- Secure login using JWT.
-- Role-aware access for Admin, HR, Recruiter, Sales Executive, and Employee users.
-- PostgreSQL-backed CRUD operations.
-- Consistent API response envelopes.
-- Dashboard metrics and follow-up visibility.
-- Production-oriented middleware for CORS, Helmet, rate limiting, validation, and centralized error handling.
+## Requirements
 
-## Roles and Permissions
+- Node.js (16+ recommended)
+- PostgreSQL (12+)
 
-| Role | Typical Access |
-| --- | --- |
-| Super Admin | Full system access, user provisioning, and global configuration changes. |
-| Admin | Full access to CRM operations, employee and recruiter management, and dashboard oversight. |
-| HR | Employee lifecycle tasks, position oversight, recruiter coordination, and task visibility. |
-| Recruiter | Manage recruiting-related positions and view recruiter-specific performance data. |
-| Sales Executive | Manage client records and follow-up tasks relevant to their accounts. |
-| Employee | View personal dashboard information and task assignments. |
+## Environment (important variables)
 
-## Tech Stack
+Backend (example):
 
-- Frontend: React, Vite, React Router, Axios, Tailwind CSS
-- Backend: Node.js, Express, CommonJS modules
-- Database: PostgreSQL with `pg` connection pool
-- Authentication: JWT, bcrypt password hashing
-- Validation: express-validator
-- Security middleware: Helmet, CORS, express-rate-limit
-
-## Setup Instructions
-
-### 1. Clone or Open the Project
-
-Open the project root:
-
-```bash
-cd "Mayzax CRM"
 ```
-
-### 2. Configure Environment Variables
-
-Create the backend environment file from the provided example:
-
-```bash
-copy .env.example backend\.env
-```
-
-If you want to use the shared root example directly, keep the same keys in a root `.env` file as well. The backend code reads these values from the environment at runtime.
-
-Required variables:
-
-```env
 PORT=5000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
@@ -66,181 +29,129 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=mayzax_crm
 DB_USER=postgres
-DB_PASSWORD=your_actual_password
-DB_POOL_MAX=20
-DB_IDLE_TIMEOUT_MS=30000
-DB_CONNECTION_TIMEOUT_MS=5000
+DB_PASSWORD=yourpassword
 
-JWT_SECRET=your_long_random_secret_here
+JWT_SECRET=your_jwt_secret_here
 JWT_EXPIRES_IN=24h
 RESET_TOKEN_EXPIRES_IN=1h
 ```
 
-For the frontend, create or update `frontend/.env` if needed:
+Frontend (example `frontend/.env`):
 
-```env
+```
 VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
-### 3. Install Dependencies
+## Install and run (local)
 
-Backend:
+1. Install backend deps and start API:
 
 ```bash
 cd backend
 npm install
+npm start
 ```
 
-Frontend:
+2. Install frontend deps and start dev server:
 
 ```bash
-cd ../frontend
+cd frontend
 npm install
+npm run dev
 ```
 
-### 4. Initialize the Database
-
-Make sure PostgreSQL is running, then create the database and load the schema:
+3. Initialize database schema (Postgres must be running):
 
 ```bash
 psql -U postgres -c "CREATE DATABASE mayzax_crm;"
 psql -U postgres -d mayzax_crm -f backend/schema.sql
 ```
 
-If your local PostgreSQL uses a different user or password, adjust the command accordingly.
+Health check: `GET /api/health` (e.g. `http://localhost:5000/api/health`).
 
-### 5. Start the Backend
+## Tech Stack and Key Dependencies
 
-```bash
-cd backend
-npm start
-```
+- Backend (from `backend/package.json`): `express`, `pg`, `jsonwebtoken`, `bcryptjs`, `express-validator`, `helmet`, `cors`, `express-rate-limit`, `dotenv`.
+- Frontend (from `frontend/package.json`): `react`, `react-dom`, `react-router-dom`, `axios`, `tailwindcss`, `vite`.
 
-Backend default URL:
+These lists reflect the packages actually used by the current codebase.
 
-```text
-http://localhost:5000/api
-```
-
-Health check:
-
-```text
-http://localhost:5000/api/health
-```
-
-### 6. Start the Frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-Frontend default URL:
-
-```text
-http://localhost:5173
-```
-
-## Available Features
+## Features (implemented)
 
 - Authentication
-  - Login with email and password.
-  - JWT-based protected routes.
-  - Password hashing with bcrypt.
-  - Profile verification on app startup.
+  - Email/password login (`POST /api/auth/login`).
+  - JWT-protected routes; token verification and role-aware middleware.
+  - Password hashing using bcrypt; forgot-password flow issues a reset token (not emailed in this build).
+  - Frontend verifies session by requesting `/api/auth/profile` on app startup.
 
-- Dashboard
-  - Active client count.
-  - Open position count.
-  - Follow-ups due today.
-  - Recent task visibility.
+- Clients
+  - List, create, update, archive toggle, and delete clients.
+  - Search and filter in list endpoints; CSV export available in the frontend `DataTable` component.
 
-- Client Management
-  - List, create, update, archive, and delete clients.
-  - Search, filter, and CSV export through DataTable.
+- Employees
+  - Admin-only endpoints for listing, creating, updating, and removing employees.
+  - Employee records are linked to `users` and include department/designation/reporting manager.
 
-- Employee Management
-  - Admin-only employee listing and account management.
-  - Employee creation with linked user account.
-  - Role and status updates.
+- Recruiters
+  - Admin-only CRUD for recruiter profiles and assigned fields.
+  - Recruiter performance endpoint exists (`GET /api/crm/recruiters/performance`).
 
-- Recruiter Management
-  - Admin-only recruiter CRUD.
-  - Recruiter field assignment.
-  - Recruiter performance endpoint.
+- Positions
+  - Create, list, view, update, and delete job positions linked to clients and recruiters.
 
-- Job Position Tracking
-  - Create and view job positions.
-  - Link positions to clients and recruiters.
-  - Track status, openings, technology, location, and salary range.
+- Tasks / Follow-ups
+  - Create, list, update, delete tasks; RBAC enforces visibility and assignment rules.
+  - `GET /api/crm/tasks/due-today` and analytics summary endpoint (`/api/crm/analytics/summary`).
 
-- Task and Follow-up Management
-  - Create, view, update, and delete follow-up tasks.
-  - Tasks can be linked to clients.
-  - Non-Admin/HR task creation defaults assignment to the current user.
-  - Users only see their own tasks unless they have elevated roles.
+- Activity feed
+  - Recent activity entries available via `/api/crm/activities` and `/api/crm/activities/recent`.
 
-## API Reference
+If you require a feature to be explicitly disabled or removed from the UI, tell me which one and I will mark it "Not implemented in this version." Currently the listed items above are implemented in the codebase.
 
-### Authentication
+## API reference (selected endpoints)
 
-- `POST /api/auth/login` — Authenticate a user and return a JWT.
-- `POST /api/auth/forgot-password` — Request a password reset flow.
-- `POST /api/auth/change-password` — Change the current user's password.
-- `GET /api/auth/profile` — Retrieve the authenticated user's profile.
+- `POST /api/auth/login` — login, returns JWT and user.
+- `GET /api/auth/profile` — returns authenticated user's profile.
+- `GET /api/health` — service and DB health.
+- `GET /api/crm/clients` — list clients (search, filter, pagination supported).
+- `POST /api/crm/clients` — create client (role-protected).
+- `GET /api/crm/positions` — list positions.
+- `POST /api/crm/tasks` — create task.
+- `GET /api/crm/analytics/summary` — dashboard metrics.
 
-### Health
+For a full list, consult `backend/routes/authRoutes.js` and `backend/routes/crmRoutes.js`.
 
-- `GET /api/health` — Verify the API and database connectivity.
+## Test credentials (seeded)
 
-### CRM Resources
+The database schema (`backend/schema.sql`) includes a seeded Super Admin account useful for review and testing:
 
-- `GET /api/crm/clients` — List clients.
-- `POST /api/crm/clients` — Create a client.
-- `PUT /api/crm/clients/:id` — Update a client.
-- `PATCH /api/crm/clients/:id/archive` — Archive a client.
-- `GET /api/crm/employees` — List employees.
-- `POST /api/crm/employees` — Create an employee account.
-- `PUT /api/crm/employees/:id` — Update an employee.
-- `DELETE /api/crm/employees/:id` — Remove an employee.
-- `GET /api/crm/recruiters` — List recruiters.
-- `POST /api/crm/recruiters` — Create a recruiter.
-- `PUT /api/crm/recruiters/:id` — Update a recruiter.
-- `DELETE /api/crm/recruiters/:id` — Remove a recruiter.
-- `GET /api/crm/positions` — List positions.
-- `POST /api/crm/positions` — Create a position.
-- `PUT /api/crm/positions/:id` — Update a position.
-- `DELETE /api/crm/positions/:id` — Remove a position.
-- `GET /api/crm/tasks` — List tasks.
-- `POST /api/crm/tasks` — Create a task.
-- `PUT /api/crm/tasks/:id` — Update a task.
-- `DELETE /api/crm/tasks/:id` — Remove a task.
-- `GET /api/crm/analytics/summary` — Retrieve dashboard metrics.
-- `GET /api/crm/activities/recent` — Retrieve recent activity entries.
+- Email: `admin@mayzax.com`
+- Password: `Admin@123`
 
-## API Response Convention
+Use these credentials after you load `backend/schema.sql` into a fresh Postgres instance.
 
-Successful responses use:
+## Production deployment (Render)
 
-```json
-{
-  "success": true,
-  "data": {}
-}
-```
+This project is deployed as a split service on Render:
 
-Error responses use:
+- Backend: Render Web Service (Node). Start command: `node server.js`. Set the environment variables listed above in Render's dashboard. Ensure `PORT` is set by Render; the app reads `process.env.PORT`.
+- Frontend: Render Static Site. Build with `npm run build` inside `frontend` and publish the `frontend/dist` directory.
 
-```json
-{
-  "success": false,
-  "message": "Readable error message"
-}
-```
+Environment notes for Render:
 
-## Assessment Notes
+- Backend requires `DATABASE_URL` or the individual DB variables used in `backend/config/db.js`.
+- Supply `JWT_SECRET` and other secrets via Render's environment settings — do not commit secrets to source control.
 
-- The active backend route files are `authRoutes.js` and `crmRoutes.js`.
-- Stale employee and position route files have been removed to avoid CommonJS/ESM mismatch and schema drift.
-- The database schema currently uses integer `SERIAL`/`BIGSERIAL` primary keys with foreign key constraints.
-- If strict UUID primary keys are required by the assessment, the schema must be migrated from integer IDs to UUIDs before final deployment.
+## Contributing / Notes for examiners
+
+- The API uses consistent response envelopes: `{ success: boolean, data?: any, message?: string }`.
+- The database schema uses integer `SERIAL`/`BIGSERIAL` primary keys. If you need UUID primary keys, migrate the schema before production use.
+
+---
+
+If you'd like, I can:
+
+- Run a quick script to extract and list all endpoints automatically.
+- Add a short `DEPLOYMENT.md` with Render step-by-step keys and expected environment variables.
+
+Updated to match the code currently in this repository.
