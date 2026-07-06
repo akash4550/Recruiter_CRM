@@ -80,16 +80,21 @@ const ClientsPage = () => {
     }
   };
 
-  const handleArchive = async (id) => {
-    if (!window.confirm("Are you sure you want to archive this client?")) return;
-    try {
-      await client.patch(`/crm/clients/${id}/archive`);
-      await fetchClients();
-    } catch (error) {
-      console.error("Failed to archive client:", error);
-      alert(error.response?.data?.message || 'Could not archive client.');
-    }
-  };
+  const handleArchive = async (id, isArchived) => {
+  const action = isArchived ? "unarchive" : "archive";
+
+  if (!window.confirm(`Are you sure you want to ${action} this client?`)) {
+    return;
+  }
+
+  try {
+    await client.patch(`/crm/clients/${id}/archive`);
+    await fetchClients();
+  } catch (error) {
+    console.error(`Failed to ${action} client:`, error);
+    alert(error.response?.data?.message || `Could not ${action} client.`);
+  }
+};
 
   const columns = useMemo(() => [
     { header: 'Company Name', accessor: 'company_name' },
@@ -108,22 +113,31 @@ const ClientsPage = () => {
       )
     },
     {
-      header: 'Actions',
-      accessor: 'id',
-      render: (row) => (
-        <div className="flex space-x-3">
-          <button onClick={() => openModal(row)} className="text-brand-primary hover:text-indigo-800 text-sm font-medium transition-colors">
-            Edit
-          </button>
-          {row.status !== 'Archived' && (
-             <button onClick={() => handleArchive(row.id)} className="text-slate-400 hover:text-red-600 text-sm font-medium transition-colors">
-               Archive
-             </button>
-          )}
-        </div>
-      )
-    }
-  ], []);
+  header: 'Actions',
+  accessor: 'id',
+  render: (row) => (
+    <div className="flex space-x-3">
+      <button
+        onClick={() => openModal(row)}
+        className="text-brand-primary hover:text-indigo-800 text-sm font-medium transition-colors"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => handleArchive(row.id, row.status === 'Archived')}
+        className={`text-sm font-medium transition-colors ${
+          row.status === 'Archived'
+            ? 'text-emerald-600 hover:text-emerald-800'
+            : 'text-slate-400 hover:text-red-600'
+        }`}
+      >
+        {row.status === 'Archived' ? 'Unarchive' : 'Archive'}
+      </button>
+    </div>
+  )
+}
+], [handleArchive]);
 
   return (
     <div className="space-y-6">

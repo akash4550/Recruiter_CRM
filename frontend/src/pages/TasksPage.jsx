@@ -167,10 +167,13 @@ const TasksPage = () => {
         render: (row) => row.assigned_to_name || 'Unassigned',
       },
       {
-        header: 'Due Date',
-        accessor: 'due_date',
-        render: (row) => row.due_date || '—',
-      },
+  header: 'Due Date',
+  accessor: 'due_date',
+  render: (row) =>
+    row.due_date
+      ? new Date(row.due_date).toLocaleDateString('en-GB')
+      : '—',
+},
       {
         header: 'Priority',
         accessor: 'priority',

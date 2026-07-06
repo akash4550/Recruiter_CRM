@@ -95,10 +95,25 @@ const EmployeesPage = () => {
       }
 
       if (editingId) {
-        await client.put(`/crm/employees/${editingId}`, payload);
-      } else {
-        await client.post('/crm/employees', payload);
-      }
+  // Update employee profile
+  await client.put(`/crm/employees/${editingId}`, {
+    name: payload.name,
+    email: payload.email,
+    department: payload.department,
+    designation: payload.designation,
+    joining_date: payload.joining_date,
+    reporting_manager_id: payload.reporting_manager_id,
+  });
+
+  // Update role and status
+  await client.patch(`/crm/employees/${editingId}/status-role`, {
+    role: payload.role,
+    status: payload.status,
+  });
+} else {
+  payload.password = formData.password;
+  await client.post('/crm/employees', payload);
+}
 
       await fetchEmployees();
       closeModal();

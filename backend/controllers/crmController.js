@@ -605,7 +605,12 @@ async function updateEmployeeStatusAndRole(req, res, next) {
 
   try {
     const { id } = req.params;
-    const { status, role, user_status } = req.body;
+    let { status, role, user_status } = req.body;
+
+// Keep login status synchronized with employee status
+if (status && !user_status) {
+  user_status = status;
+}
 
     const existing = await query(
       `SELECT e.id, e.user_id, u.name, u.email, u.role, u.status AS user_status, e.status
